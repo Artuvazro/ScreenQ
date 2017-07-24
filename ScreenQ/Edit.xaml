@@ -1,0 +1,94 @@
+﻿<Window x:Class="ScreenQ.Edit"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScreenQ"
+        mc:Ignorable="d"
+        Title="ScreenQ" Height="300" Width="300" WindowState="Maximized">
+    <Grid ShowGridLines="False">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="9.5*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="True" VerticalAlignment="Stretch" HorizontalAlignment="Left" Background="LightGray" Cursor="Arrow" IsHitTestVisible="True" UseLayoutRounding="False">
+            <Button  Name="PencilButton" ToolTip="Click here to draw with a pen" Click="SelectPencil_Button" Margin="5,0,5,0" BorderBrush="LightGray" Background="LightGray">
+                <StackPanel>
+                    <Image Source="./icon/pencil.png" Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </StackPanel>
+            </Button>
+            <Button Name="RectangleButton" ToolTip="Click here to draw a rectangle" Click="SelectRectangle_Button" Margin="0,0,5,0" BorderBrush="LightGray" Background="LightGray">
+                <StackPanel>
+                    <Image Source="./icon/rectangle.png" Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </StackPanel>
+            </Button>
+            <Button  Name="CircleButton" ToolTip="Click here to draw a circle" Click="SelectCircle_Button" Margin="0,0,5,0" BorderBrush="LightGray" Background="LightGray">
+                <StackPanel>
+                    <Image Source="./icon/ellipse.png" Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </StackPanel>
+            </Button>
+            <Button Name="EraserButton" ToolTip="Click here to delete any shape you have drawn" Click="SelectEraser_Button" Margin="0,0,5,0" BorderBrush="LightGray" Background="LightGray">
+                <StackPanel>
+                    <Image Source="./icon/eraser.png" Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </StackPanel>
+            </Button>
+            <Button Name="SaveButton" ToolTip="Click here to save this screenshot" Margin="0,0,5,0" BorderBrush="LightGray" Background="LightGray" Click="SaveButton_Click">
+                <StackPanel>
+                    <Image Source="./icon/save.png" Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </StackPanel>
+            </Button>
+            <ComboBox x:Name="ColorPicker" ToolTip="Stroke color" Height="37" VerticalAlignment="Top" Width="120" FontSize="24" SelectionChanged="ColorPicker_SelectionChanged" SelectedIndex="0">
+                <ComboBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="15" Height="10" Fill="Red" Stroke="Black"></Rectangle>
+                        <TextBlock Margin="10,0,0,0" Foreground="Red">Red</TextBlock>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="15" Height="10" Fill="Blue" Stroke="Black"></Rectangle>
+                        <TextBlock Margin="10,0,0,0" Foreground="Blue">Blue</TextBlock>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="15" Height="10" Fill="Yellow" Stroke="Black"></Rectangle>
+                        <TextBlock Margin="10,0,0,0" Foreground="Gold">Yellow</TextBlock>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="15" Height="10" Fill="LimeGreen" Stroke="Black"></Rectangle>
+                        <TextBlock Margin="10,0,0,0" Foreground="LimeGreen">Green</TextBlock>
+                    </StackPanel>
+                </ComboBoxItem>                
+                <ComboBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="15" Height="10" Fill="Black" Stroke="Black"></Rectangle>
+                        <TextBlock Margin="10,0,0,0" Foreground="Black">Black
+                        </TextBlock>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="15" Height="10" Fill="White" Stroke="Black"></Rectangle>
+                        <TextBlock Margin="10,0,0,0" Foreground="Gray">White</TextBlock>
+                    </StackPanel>
+                </ComboBoxItem>
+            </ComboBox>
+            <TextBox Name="SizeBox" ToolTip="Stroke size" Height="Auto" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="70" FontSize="20" TextChanged="SizeBox_TextChanged" GotFocus="SizeBox_GotFocus" LostFocus="SizeBox_LostFocus"/>
+            <Label VerticalAlignment="center">Additional info:</Label>
+            <TextBox Name="additionalBox" ToolTip="Additional info" Height="Auto" VerticalAlignment="Stretch" Width="200" FontSize="12" TextWrapping="WrapWithOverflow" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True"/>
+        </DockPanel>
+        <ScrollViewer Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <Canvas SnapsToDevicePixels="True" Name="paintSurface" MouseLeftButtonDown="Canvas_MouseDown_1" MouseMove="Canvas_MouseMove_1" MouseLeftButtonUp="Canvas_MouseUp_1" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <Canvas.Children>
+                    <Image Name="capturedImage"></Image>
+                </Canvas.Children>
+            </Canvas>
+        </ScrollViewer>
+    </Grid>
+</Window>
