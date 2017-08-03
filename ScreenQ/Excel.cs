@@ -50,7 +50,7 @@ namespace ScreenQ
                 worksheet.Column(2).AutoFit();
                 worksheet.Column(3).AutoFit();
                 worksheet.Column(4).AutoFit();
-                worksheet.Column(1).Width = 195;    //Debería calcularse con la captura de pantalla, pero bueno.
+                worksheet.Column(1).Width = 138.3;    //Debería calcularse con la captura de pantalla, pero bueno.
                 package.Save();
             }
 
@@ -67,9 +67,10 @@ namespace ScreenQ
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
                 Image myImage = Image.FromFile(Properties.Settings.Default["ScreenShotSavePath"].ToString() + "\\screenshot - " + ((int)Properties.Settings.Default["ScreenID"] - 1) + ".png");
                 var pic = worksheet.Drawings.AddPicture(((int)Properties.Settings.Default["ScreenID"] - 1 ).ToString(), myImage);
+                pic.SetSize(969, 545);
                 pic.SetPosition((int)Properties.Settings.Default["ScreenID"] - 1, 0, 0, 0);
                 //pic.SetSize(320,240);
-                worksheet.Row((int)Properties.Settings.Default["ScreenID"]).Height = 575;
+                worksheet.Row((int)Properties.Settings.Default["ScreenID"]).Height = 545; // Maximum allowed by Excel is 545.
 
                 if(errorType != null)
                 {
