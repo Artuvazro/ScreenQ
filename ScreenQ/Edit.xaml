@@ -84,7 +84,7 @@
             <TextBox Name="additionalBox" ToolTip="Additional info" Height="Auto" VerticalAlignment="Stretch" Width="200" FontSize="12" TextWrapping="WrapWithOverflow" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True"/>
         </DockPanel>
         <ScrollViewer Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <Canvas SnapsToDevicePixels="True" Name="paintSurface" MouseLeftButtonDown="Canvas_MouseDown_1" MouseMove="Canvas_MouseMove_1" MouseLeftButtonUp="Canvas_MouseUp_1" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Canvas SnapsToDevicePixels="True" Name="paintSurface" MouseRightButtonUp="Canvas_MouseUp_2" MouseRightButtonDown="Canvas_MouseDown_2" MouseLeftButtonDown="Canvas_MouseDown_1" MouseMove="Canvas_MouseMove_1" MouseLeftButtonUp="Canvas_MouseUp_1" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <Canvas.Children>
                     <Image Name="capturedImage"></Image>
                 </Canvas.Children>

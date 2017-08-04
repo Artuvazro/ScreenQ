@@ -66,6 +66,7 @@ namespace ScreenQ
         private String selectedError;
         private List<String> selectedErrors = new List<String>();
         private List<String> selectedErrorBranch = new List<String>();
+        private Cursor lastCursor;
 
 
         private void PopulateErrorContextMenu()
@@ -83,19 +84,19 @@ namespace ScreenQ
             {
                 default:
                 case "MANUAL":
-                    Cursor = Cursors.Pen;
+                    lastCursor = Cursor = Cursors.Pen;
                     PencilButton.Background = Brushes.LightSkyBlue;
                     PencilButton.BorderBrush = Brushes.CornflowerBlue;
                     lastButton = PencilButton;
                     break;
                 case "RECTANGLE":
-                    Cursor = Cursors.Cross;
+                    lastCursor = Cursor = Cursors.Cross;
                     RectangleButton.Background = Brushes.LightSkyBlue;
                     RectangleButton.BorderBrush = Brushes.CornflowerBlue;
                     lastButton = RectangleButton;
                     break;
                 case "CIRCLE":
-                    Cursor = Cursors.Cross;
+                    lastCursor = Cursor = Cursors.Cross;
                     CircleButton.Background = Brushes.LightSkyBlue;
                     CircleButton.BorderBrush = Brushes.CornflowerBlue;
                     lastButton = CircleButton;
@@ -120,7 +121,7 @@ namespace ScreenQ
             if (lastButton != PencilButton)
             {
                 ChangeButtonState(PencilButton);
-                Cursor = Cursors.Pen;
+                lastCursor = Cursor = Cursors.Pen;
                 Properties.Settings.Default["SavedLastTool"] = "MANUAL";
                 Properties.Settings.Default.Save();
             }
@@ -132,7 +133,7 @@ namespace ScreenQ
             if (lastButton != RectangleButton)
             {
                 ChangeButtonState(RectangleButton);
-                Cursor = Cursors.Cross;
+                lastCursor = Cursor = Cursors.Cross;
                 Properties.Settings.Default["SavedLastTool"] = "RECTANGLE";
                 Properties.Settings.Default.Save();
             }
@@ -145,7 +146,7 @@ namespace ScreenQ
             if (lastButton != CircleButton)
             {
                 ChangeButtonState(CircleButton);
-                Cursor = Cursors.Cross;
+                lastCursor = Cursor = Cursors.Cross;
                 Properties.Settings.Default["SavedLastTool"] = "CIRCLE";
                 Properties.Settings.Default.Save();
             }
@@ -157,7 +158,7 @@ namespace ScreenQ
             if (lastButton != EraserButton)
             {
                 ChangeButtonState(EraserButton);
-                Cursor = Cursors.Arrow;
+                lastCursor = Cursor = Cursors.Arrow;
             }
                 
         }
@@ -219,85 +220,138 @@ namespace ScreenQ
                             }
                         }
 
+                        if (label != null)
+                        {
+                            selectedErrors.Remove(label.Content.ToString());
+                            selectedErrorBranch.Remove(label.Content.ToString()); // No borra todo porque el listado está construido un poco mal...
+                        }
                     }
                     break;
             }
         }
-        
+
+        ///////
+        private Point MousePosition;
+        Label selectedLabel;
+
+        private void Canvas_MouseDown_2(object sender, MouseButtonEventArgs e)
+        {
+            Point pt = e.GetPosition(paintSurface); 
+            HitTestResult result = VisualTreeHelper.HitTest(paintSurface, pt);
+
+            if((result.VisualHit is Border) || (result.VisualHit is TextBlock) || (result.VisualHit is Label))
+            {
+                MousePosition = e.GetPosition(paintSurface);
+                Cursor = Cursors.Hand;
+            }
+            if(result.VisualHit is Border)
+            {
+                var result2 = VisualTreeHelper.GetParent(result.VisualHit);
+                selectedLabel = result2 as Label;
+
+            }
+            else if (result.VisualHit is TextBlock)
+            {
+                var result2 = VisualTreeHelper.GetParent(result.VisualHit);
+                result2 = VisualTreeHelper.GetParent(result2);
+                result2 = VisualTreeHelper.GetParent(result2);
+                selectedLabel = result2 as Label;
+            }
+            else if (result.VisualHit is Label)
+            {
+                selectedLabel = result.VisualHit as Label;
+            }
+        }
+        private void Canvas_MouseUp_2(object sender, MouseButtonEventArgs e)
+        {
+            selectedLabel = null;
+            Cursor = lastCursor;
+        }
+        ///////
+
         private void Canvas_MouseMove_1(object sender, MouseEventArgs e)
         {
-            switch (SelectedTool)
+            if ((e.RightButton == MouseButtonState.Pressed) && (selectedLabel != null))
             {
-                case Tool.MANUAL:
-                    if (e.LeftButton == MouseButtonState.Pressed)
-                    {
-                        line = new Line()
+                MousePosition = e.GetPosition(paintSurface);
+                Canvas.SetLeft(selectedLabel, MousePosition.X);
+                Canvas.SetTop(selectedLabel, MousePosition.Y);
+            }
+            else
+            {
+                switch (SelectedTool)
+                {
+                    case Tool.MANUAL:
+                        if (e.LeftButton == MouseButtonState.Pressed)
                         {
-                            Stroke = myBrush,
-                            X1 = currentPoint.X,
-                            Y1 = currentPoint.Y,
-                            X2 = e.GetPosition(paintSurface).X,
-                            Y2 = e.GetPosition(paintSurface).Y,
-                            StrokeThickness = strokeSize,
-                            StrokeStartLineCap = PenLineCap.Round,
-                            StrokeEndLineCap = PenLineCap.Round,
-                            StrokeDashCap = PenLineCap.Round,
-                            StrokeLineJoin = PenLineJoin.Round,
-                            Name = "myline" + lineNumber
-                        };
-                        currentPoint = e.GetPosition(paintSurface);
-                        if (ErrorListMenu.IsVisible == true)
-                            drawingNow = false;
-                        else
-                        {
-                            drawingNow = true;
-                            paintSurface.Children.Add(line);
+                            line = new Line()
+                            {
+                                Stroke = myBrush,
+                                X1 = currentPoint.X,
+                                Y1 = currentPoint.Y,
+                                X2 = e.GetPosition(paintSurface).X,
+                                Y2 = e.GetPosition(paintSurface).Y,
+                                StrokeThickness = strokeSize,
+                                StrokeStartLineCap = PenLineCap.Round,
+                                StrokeEndLineCap = PenLineCap.Round,
+                                StrokeDashCap = PenLineCap.Round,
+                                StrokeLineJoin = PenLineJoin.Round,
+                                Name = "myline" + lineNumber
+                            };
+                            currentPoint = e.GetPosition(paintSurface);
+                            if (ErrorListMenu.IsVisible == true)
+                                drawingNow = false;
+                            else
+                            {
+                                drawingNow = true;
+                                paintSurface.Children.Add(line);
+                            }
                         }
-                    }
-                    break;
+                        break;
 
-                case Tool.RECTANGLE:
-                    if (e.LeftButton == MouseButtonState.Released || rect == null)
-                        return;
+                    case Tool.RECTANGLE:
+                        if (e.LeftButton == MouseButtonState.Released || rect == null)
+                            return;
 
-                    var pos = e.GetPosition(paintSurface);
+                        var pos = e.GetPosition(paintSurface);
 
-                    var rx = Math.Min(pos.X, startPoint.X);
-                    var ry = Math.Min(pos.Y, startPoint.Y);
+                        var rx = Math.Min(pos.X, startPoint.X);
+                        var ry = Math.Min(pos.Y, startPoint.Y);
 
-                    var rw = Math.Max(pos.X, startPoint.X) - rx;
-                    var rh = Math.Max(pos.Y, startPoint.Y) - ry;
-                    
-                    rect.Width = rw;
-                    rect.Height = rh;
-                    rect.Name = "myrectangle" + rectangleNumber;
+                        var rw = Math.Max(pos.X, startPoint.X) - rx;
+                        var rh = Math.Max(pos.Y, startPoint.Y) - ry;
 
-                    Canvas.SetLeft(rect, rx);
-                    Canvas.SetTop(rect, ry);
-                    drawingNow = true;
+                        rect.Width = rw;
+                        rect.Height = rh;
+                        rect.Name = "myrectangle" + rectangleNumber;
 
-                    break;
+                        Canvas.SetLeft(rect, rx);
+                        Canvas.SetTop(rect, ry);
+                        drawingNow = true;
 
-                case Tool.CIRCLE:
-                    if (e.LeftButton == MouseButtonState.Released || circle == null)
-                        return;
-                    
-                    var cpos = e.GetPosition(paintSurface);
+                        break;
 
-                    var cx = Math.Min(cpos.X, startPoint.X);
-                    var cy = Math.Min(cpos.Y, startPoint.Y);
+                    case Tool.CIRCLE:
+                        if (e.LeftButton == MouseButtonState.Released || circle == null)
+                            return;
 
-                    var cw = Math.Max(cpos.X, startPoint.X) - cx;
-                    var ch = Math.Max(cpos.Y, startPoint.Y) - cy;
+                        var cpos = e.GetPosition(paintSurface);
 
-                    circle.Width = cw;
-                    circle.Height = ch;
-                    circle.Name = "mycircle" + circleNumber;
+                        var cx = Math.Min(cpos.X, startPoint.X);
+                        var cy = Math.Min(cpos.Y, startPoint.Y);
 
-                    Canvas.SetLeft(circle, cx);
-                    Canvas.SetTop(circle, cy);
-                    drawingNow = true;
-                    break;
+                        var cw = Math.Max(cpos.X, startPoint.X) - cx;
+                        var ch = Math.Max(cpos.Y, startPoint.Y) - cy;
+
+                        circle.Width = cw;
+                        circle.Height = ch;
+                        circle.Name = "mycircle" + circleNumber;
+
+                        Canvas.SetLeft(circle, cx);
+                        Canvas.SetTop(circle, cy);
+                        drawingNow = true;
+                        break;
+                }
             }
         }
 
@@ -419,6 +473,7 @@ namespace ScreenQ
             ErrorListMenu.IsOpen = true;
         }
 
+
         public void Item_Click(object sender, RoutedEventArgs e)
         {
             MenuItem mi = sender as MenuItem;
@@ -436,7 +491,10 @@ namespace ScreenQ
                     FontWeight = FontWeights.Bold,
                     Background = myBrush,
                     Foreground = Brushes.White,
+                    AllowDrop = true,
+                    IsHitTestVisible = true
                 };
+
                 if (SelectedTool == Tool.MANUAL)
                     ErrorLabel.Name = "myline" + (lineNumber - 1);
 
