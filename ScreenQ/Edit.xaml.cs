@@ -515,8 +515,13 @@ namespace ScreenQ
             selectedErrorBranch.Add(mi.Header.ToString());
         }
 
+        private bool savedAlready = false;
+        private int screenID;
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            screenID = (int)Properties.Settings.Default["ScreenID"];
+
             RenderTargetBitmap renderBitmap = new RenderTargetBitmap(
             (int)paintSurface.Width, (int)paintSurface.Height, 96d, 96d, PixelFormats.Pbgra32);
             paintSurface.Measure(new Size((int)paintSurface.Width, (int)paintSurface.Height));
@@ -525,15 +530,11 @@ namespace ScreenQ
             PngBitmapEncoder encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
 
-            int screenID = (int)Properties.Settings.Default["ScreenID"];
-
             using (FileStream file = File.Create(Properties.Settings.Default["ScreenShotSavePath"].ToString() + "\\screenshot - " + screenID + ".png"))
             {
                 encoder.Save(file);
-                screenID++;
-                Properties.Settings.Default["ScreenID"] = screenID;
-                Properties.Settings.Default.Save();
             }
+
             if(File.Exists(Properties.Settings.Default["ScreenShotSavePath"].ToString() + "\\ScreenQ - Report.xlsx"))
                 Excel.WriteExcel(encoder, selectedErrors, selectedErrorBranch, additionalBox.Text);
             else
@@ -541,12 +542,25 @@ namespace ScreenQ
                 Excel.CreateExcel();
                 Excel.WriteExcel(encoder, selectedErrors, selectedErrorBranch, additionalBox.Text);
             }
-                
+            
+            if (savedAlready == false) savedAlready = true;
 
-            if(Convert.ToBoolean(Properties.Settings.Default["SaveAndClose"]) == true)
+            if (Convert.ToBoolean(Properties.Settings.Default["SaveAndClose"]) == true)
             {
                 this.Close();
             }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (savedAlready == true)
+            {
+                Properties.Settings.Default["ScreenID"] = screenID+1;
+                Properties.Settings.Default.Save();
+                screenID++;
+                savedAlready = false;
+            } 
+            
         }
     }
 }

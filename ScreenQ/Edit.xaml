@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScreenQ"
         mc:Ignorable="d"
-        Title="ScreenQ" Height="300" Width="300" WindowState="Maximized">
+        Title="ScreenQ" Height="300" Width="300" WindowState="Maximized" Closed="Window_Closed">
     <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10*"/>

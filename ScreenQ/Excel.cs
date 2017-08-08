@@ -65,33 +65,52 @@ namespace ScreenQ
             using (var package = new ExcelPackage(file))
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
-                Image myImage = Image.FromFile(Properties.Settings.Default["ScreenShotSavePath"].ToString() + "\\screenshot - " + ((int)Properties.Settings.Default["ScreenID"] - 1) + ".png");
-                var pic = worksheet.Drawings.AddPicture(((int)Properties.Settings.Default["ScreenID"] - 1 ).ToString(), myImage);
+                Image myImage = Image.FromFile(Properties.Settings.Default["ScreenShotSavePath"].ToString() + "\\screenshot - " + ((int)Properties.Settings.Default["ScreenID"]) + ".png");
+
+                //Comprobar si esto de bajo existe y si existe reemplazarlo, si no da error.
+
+
+                if ((worksheet.Drawings.Count > (int)Properties.Settings.Default["ScreenID"] -1))
+                {
+                    if (worksheet.Drawings[(int)Properties.Settings.Default["ScreenID"] - 1] != null)
+                    {
+                        worksheet.Drawings.Remove((int)Properties.Settings.Default["ScreenID"] - 1);
+                        worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 2].Value = "";
+                        worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 3].Value = "";
+                        worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 4].Value = "";
+                    }
+                        
+                }
+
+                var pic = worksheet.Drawings.AddPicture(((int)Properties.Settings.Default["ScreenID"]).ToString(), myImage);
+
+
                 pic.SetSize(969, 545);
-                pic.SetPosition((int)Properties.Settings.Default["ScreenID"] - 1, 0, 0, 0);
+                pic.SetPosition((int)Properties.Settings.Default["ScreenID"], 0, 0, 0);
                 //pic.SetSize(320,240);
-                worksheet.Row((int)Properties.Settings.Default["ScreenID"]).Height = 545; // Maximum allowed by Excel is 545.
+                worksheet.Row((int)Properties.Settings.Default["ScreenID"] + 1).Height = 409.50; // Maximum allowed by Excel is 409.50.
 
                 if(errorType != null)
                 {
                     errorType.Reverse();
-                    worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 2].Value = string.Join("\r", errorType);
+                    worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 2].Value = string.Join("\r", errorType);
                     selectedErrorBranch.Reverse();
-                    worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 3].Value = string.Join("", selectedErrorBranch);
+                    worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 3].Value = string.Join("", selectedErrorBranch);
                 }
 
-                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 4].Value = additionalText;
+                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 4].Value = additionalText;
 
-                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 2].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 3].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 4].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
                 worksheet.Column(2).AutoFit();
                 worksheet.Column(3).AutoFit();
                 worksheet.Column(4).AutoFit();
-                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 2].Style.WrapText = true;
-                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 3].Style.WrapText = true;
-                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"], 4].Style.WrapText = true;
+                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 2].Style.WrapText = true;
+                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 3].Style.WrapText = true;
+                worksheet.Cells[(int)Properties.Settings.Default["ScreenID"] + 1, 4].Style.WrapText = true;
                 package.Save();
+                myImage.Dispose();
             }
         }
         
