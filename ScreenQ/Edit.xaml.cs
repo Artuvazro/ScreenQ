@@ -479,7 +479,7 @@ namespace ScreenQ
             MenuItem mi = sender as MenuItem;
 
             if (!mi.HasItems)
-            { //Si quitas el if, te devuelve todas las categorías de la rama, eso es útil para imprimir en el Excel.
+            {
                 selectedErrorBranch.Add("\r");
                 selectedError = mi.Header.ToString();
                 selectedErrors.Add(selectedError);
@@ -522,8 +522,9 @@ namespace ScreenQ
         {
             screenID = (int)Properties.Settings.Default["ScreenID"];
 
-            RenderTargetBitmap renderBitmap = new RenderTargetBitmap(
-            (int)paintSurface.Width, (int)paintSurface.Height, 96d, 96d, PixelFormats.Pbgra32);
+            //Probablemente esto esté causando el leak de memoria. Convertir en using o usar dispose.
+
+            RenderTargetBitmap renderBitmap = new RenderTargetBitmap((int)paintSurface.Width, (int)paintSurface.Height, 96d, 96d, PixelFormats.Pbgra32);
             paintSurface.Measure(new Size((int)paintSurface.Width, (int)paintSurface.Height));
             paintSurface.Arrange(new Rect(new Size((int)paintSurface.Width, (int)paintSurface.Height)));
             renderBitmap.Render(paintSurface);
@@ -549,6 +550,10 @@ namespace ScreenQ
             {
                 this.Close();
             }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
         private void Window_Closed(object sender, EventArgs e)
